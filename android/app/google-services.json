@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "809391752852",
+    "project_id": "tesisapp-75468",
+    "storage_bucket": "tesisapp-75468.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:809391752852:android:05a9e27dad22d7b6549681",
+        "android_client_info": {
+          "package_name": "com.example.tourist_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "809391752852-orommmufg18vkdlliq5l7ruopk0u7epc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tourist_app",
+            "certificate_hash": "ba34b088237850430d446d28630ced4b9ebd8f4c"
+          }
+        },
+        {
+          "client_id": "809391752852-tjjqkddq33jrj8t4ce1sjts4h644ckes.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfLiXcwuxWO9B3gjryem4AasfyXzGtgo0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "809391752852-tjjqkddq33jrj8t4ce1sjts4h644ckes.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "809391752852-fgscr8ksk691gbormdc233qoag3bka17.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.touristTesisApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
