@@ -6,7 +6,7 @@ import 'package:tourist_app/screens/login_screen.dart';
 import 'package:tourist_app/screens/registration_screen.dart';
 import 'package:tourist_app/screens/home_screen.dart';
 
-void main() async { 
+Future<void> main() async { 
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const MyApp());

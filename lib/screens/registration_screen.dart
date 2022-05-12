@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:tourist_app/models/user_model.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
@@ -9,6 +12,9 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
+
+  // firebase
+  final _auth = FirebaseAuth.instance;
 
   // clave del formulario
   final _formKey = GlobalKey<FormState>();
@@ -86,7 +92,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     final apellidoField = TextFormField(
       autofocus: false,
       controller: apellidoController,
-      keyboardType: TextInputType.number,
+      keyboardType: TextInputType.name,
       validator: ( value ){
         RegExp regex = RegExp(r'^.{3,}$');
         if(value!.isEmpty){
@@ -121,7 +127,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           return ("Por favor ingresa tu email");
         }
         // reg expresion para validacion email
-        if(RegExp(r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$').hasMatch(value)){
+        if(!RegExp(r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$').hasMatch(value)){
           return ('Por favor ingrese un email válido');
         }
         return null;
@@ -154,6 +160,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         if(!regex.hasMatch(value)){
           return ("La contraseña debe ser de 8 o más caracteres");
         }
+        return null;
       },
       onSaved: ( value ){
         passwordController.text = value!;
@@ -204,15 +211,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
         onPressed: (){
-          FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: emailController.text, 
-            password: passwordController.text
-          ).then((value) {
-            print("Nueva cuenta creada");
-            Navigator.pushReplacementNamed(context, 'home');
-          }).onError((error, stackTrace) {
-            print("Error ${error.toString()}");
-          });
+          registrarse(emailController.text, passwordController.text);
         },
         child: const Text(
           'Registar', 
@@ -238,7 +237,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   children: [
                     const SizedBox(
                       height: 100,
-                      child: Icon(Icons.person_pin, color: Colors.green, size: 100,)
+                      child: Image(
+                        image: AssetImage("assets/img/logo-png.png"),
+                        width: 100,
+                        height: 100,
+                      )
                     ),
                     const SizedBox(height: 45,),
                     identificacionField,
@@ -284,6 +287,43 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       ),
     );
 
+  }
+
+  void registrarse(String email, String password) async {
+    if(_formKey.currentState!.validate()){
+      await  _auth.createUserWithEmailAndPassword(email: email, password: password)
+        .then((value) => {
+          postDetailsToFirestore()
+        }).catchError((e){
+          Fluttertoast.showToast(msg: e!.message);
+        });
+    }
+  }
+
+  postDetailsToFirestore() async {
+    // llamando a nuestro firestore
+    // llamando a nuestro UserModel
+    // enviando los valores
+
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    User? user = _auth.currentUser;
+
+    UserModel userModel = UserModel();
+
+    // escribiendo todos los valores
+    userModel.email = user!.email;
+    userModel.uid = user.uid;
+    userModel.identificacion = identificacionController.text;
+    userModel.nombre = nombreController.text;
+    userModel.apellido = apellidoController.text;
+
+    await firebaseFirestore
+      .collection("users")
+      .doc(user.uid)
+      .set(userModel.toMap());
+    Fluttertoast.showToast(msg: "Usuario creado correctamente");
+
+    Navigator.pushReplacementNamed(context, 'home');
   }
 
 }

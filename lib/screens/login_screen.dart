@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -16,6 +18,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  // firebase
+  final _auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     
@@ -27,10 +32,6 @@ class _LoginScreenState extends State<LoginScreen> {
       validator: ( value ){
         if(value!.isEmpty){
           return ("Por favor ingresa tu email");
-        }
-        // reg expresion para validacion email
-        if(RegExp(r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$').hasMatch(value)){
-          return ('Por favor ingrese un email válido');
         }
         return null;
       },
@@ -61,14 +62,11 @@ class _LoginScreenState extends State<LoginScreen> {
       autocorrect: false,
       obscureText: true,
       controller: passwordController,
-      validator: ( value ){
-        RegExp regex = RegExp(r'^.{8,}$');
+      validator: ( value ) {
         if(value!.isEmpty){
           return ('La contraseña es obligatoria para ingresar');
         }
-        if(!regex.hasMatch(value)){
-          return ("La contraseña debe ser de 8 o más caracteres");
-        }
+        return null;
       },
       onSaved: ( value ){
         passwordController.text = value!;
@@ -100,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         minWidth: MediaQuery.of(context).size.width,
         onPressed: (){
-          
+          login(emailController.text, passwordController.text);
         },
         child: const Text(
           'Ingresar', 
@@ -126,7 +124,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     const SizedBox(
                       height: 200,
-                      child: Icon(Icons.person_pin, color: Colors.green, size: 100,)
+                      child: Image(
+                        image: AssetImage("assets/img/logo-png.png"),
+                        width: 100,
+                        height: 100,
+                      )
+                      //Icon(Icons.person_pin, color: Colors.green, size: 100,)
                     ),
                     const SizedBox(height: 45,),
                     emailField,
@@ -163,6 +166,22 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  // login function
+  Future<void> login(String email, String password) async {
+
+    if(_formKey.currentState!.validate()){
+      await _auth
+        .signInWithEmailAndPassword(email: email, password: password)
+        .then((uid) => {
+          Fluttertoast.showToast(msg: 'Login Successfull'),
+          Navigator.pushReplacementNamed(context, 'home')
+        }).catchError((e){
+          Fluttertoast.showToast(msg: e!.message);
+        });
+    }
+
   }
 
 }
